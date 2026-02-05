@@ -3,41 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Face - Commented Guide</title>
+    <title>Interactive Face - Mobile & Desktop</title>
     <style>
-        /* CSS: RESET & LAYOUT */
         * {
-            box-sizing: border-box; /* Ensures padding doesn't affect element width */
+            box-sizing: border-box; 
             margin: 0;
             padding: 0;
+            /* Prevents the browser from handling touch for scrolling/zooming on the face */
+            touch-action: none; 
         }
 
         body {
             min-height: 100vh; 
             background-color: #545b7c; 
             display: grid; 
-            place-content: center; /* Centers the face perfectly in the middle of the screen */
-            overflow: hidden;      /* Hides scrollbars if the mouth swings near the edge */
+            place-content: center;
+            overflow: hidden;
         }
 
-        /* FACE COMPONENTS */
         .face {
             display: flex; 
-            flex-direction: column; /* Stacks eyes on top of the mouth */
+            flex-direction: column; 
             align-items: center; 
-            gap: 24px;              /* Space between eyes and mouth */
+            gap: 24px;
         }
 
         .eyes {
             display: flex; 
-            gap: 15px;              /* Space between the two eye sockets */
+            gap: 15px; 
         }
 
         .eye-right, .eye-left {
             width: 4.5rem; 
             aspect-ratio: 1/1;
             background: #ececec; 
-            border-radius: 50%;      /* Makes the eye socket a circle */
+            border-radius: 50%; 
             display: flex;
             justify-content: center; 
             align-items: center;
@@ -47,18 +47,17 @@
             width: 1.5rem; 
             aspect-ratio: 1/1; 
             background: #222; 
-            border-radius: 50%;      /* The black pupil */
-            /* Smooths the movement so the eyes don't "flicker" instantly */
+            border-radius: 50%;
             transition: transform 0.1s ease-out;
         }
 
         .mouth {
             width: 4rem; 
             height: 2rem; 
-            border-bottom: 0.8rem solid gold; /* Creates the "smile" shape using the bottom border */
+            border-bottom: 0.8rem solid gold; 
             border-radius: 50%; 
-            transition: transform 0.1s ease-out; /* Makes the swinging motion smooth */
-            transform-origin: top center;        /* The mouth "hangs" from the top like a pendulum */
+            transition: transform 0.1s ease-out;
+            transform-origin: top center;
         }
     </style>
 </head>
@@ -77,43 +76,47 @@
     </div>
 
     <script>
-        // JAVASCRIPT: LOGIC
-        
-        // 1. Select the elements we need to move
         const eyeballs = document.querySelectorAll('.eyeball');
         const mouth = document.querySelector('.mouth');
         
-        // 2. This function runs every time the mouse moves
         const handleMove = (e) => {
-            // Find the center point of your browser window
+            // This line detects if it's a touch event or a mouse event
+            // If it's a touch, it takes the coordinates of the first finger (touches[0])
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
             const centerX = window.innerWidth / 2;
             const centerY = window.innerHeight / 2;
             
-            // 3. Calculate how far the mouse is from the center
-            // 'x' and 'y' will be between -1 (far left/top) and 1 (far right/bottom)
-            const x = (e.clientX - centerX) / centerX;
-            const y = (e.clientY - centerY) / centerY;
+            const x = (clientX - centerX) / centerX;
+            const y = (clientY - centerY) / centerY;
             
-            // 4. EYE MOVEMENT
-            // Multiply 'x' by 70 to move the eyeball within the white socket (70% offset)
+            // Eye logic
             const eyeX = x * 70; 
             const eyeY = y * 70;
             eyeballs.forEach(el => {
                 el.style.transform = `translate(${eyeX}%, ${eyeY}%)`;
             });
 
-            // 5. MOUTH MOVEMENT
-            // Move the mouth horizontally by up to 20 pixels
+            // Mouth logic
             const mouthX = x * 20; 
-            // Rotate the mouth by up to 15 degrees based on mouse position
             const mouthRotate = x * 15; 
-            
-            // Apply both the shift and the tilt to the mouth
             mouth.style.transform = `translateX(${mouthX}px) rotate(${mouthRotate}deg)`;
         };
 
-        // 6. Tell the browser to listen for the mouse moving and trigger our function
+        // Listen for Mouse movement
         window.addEventListener('mousemove', handleMove);
+
+        // Listen for Touch movement (Mobile)
+        window.addEventListener('touchmove', handleMove);
+
+        // Optional: Reset face when finger lifts or mouse leaves
+        const resetFace = () => {
+            eyeballs.forEach(el => el.style.transform = `translate(0, 0)`);
+            mouth.style.transform = `translateX(0) rotate(0deg)`;
+        };
+
+        window.addEventListener('touchend', resetFace);
     </script>
 </body>
 </html>
