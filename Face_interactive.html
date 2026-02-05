@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Face - Commented Guide</title>
+    <style>
+        /* CSS: RESET & LAYOUT */
+        * {
+            box-sizing: border-box; /* Ensures padding doesn't affect element width */
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh; 
+            background-color: #545b7c; 
+            display: grid; 
+            place-content: center; /* Centers the face perfectly in the middle of the screen */
+            overflow: hidden;      /* Hides scrollbars if the mouth swings near the edge */
+        }
+
+        /* FACE COMPONENTS */
+        .face {
+            display: flex; 
+            flex-direction: column; /* Stacks eyes on top of the mouth */
+            align-items: center; 
+            gap: 24px;              /* Space between eyes and mouth */
+        }
+
+        .eyes {
+            display: flex; 
+            gap: 15px;              /* Space between the two eye sockets */
+        }
+
+        .eye-right, .eye-left {
+            width: 4.5rem; 
+            aspect-ratio: 1/1;
+            background: #ececec; 
+            border-radius: 50%;      /* Makes the eye socket a circle */
+            display: flex;
+            justify-content: center; 
+            align-items: center;
+        }
+
+        .eyeball {
+            width: 1.5rem; 
+            aspect-ratio: 1/1; 
+            background: #222; 
+            border-radius: 50%;      /* The black pupil */
+            /* Smooths the movement so the eyes don't "flicker" instantly */
+            transition: transform 0.1s ease-out;
+        }
+
+        .mouth {
+            width: 4rem; 
+            height: 2rem; 
+            border-bottom: 0.8rem solid gold; /* Creates the "smile" shape using the bottom border */
+            border-radius: 50%; 
+            transition: transform 0.1s ease-out; /* Makes the swinging motion smooth */
+            transform-origin: top center;        /* The mouth "hangs" from the top like a pendulum */
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="face">
+        <div class="eyes">
+            <div class="eye-left">
+                <div class="eyeball"></div>
+            </div>
+            <div class="eye-right">
+                <div class="eyeball"></div>
+            </div>
+        </div> 
+        <div class="mouth"></div>
+    </div>
+
+    <script>
+        // JAVASCRIPT: LOGIC
+        
+        // 1. Select the elements we need to move
+        const eyeballs = document.querySelectorAll('.eyeball');
+        const mouth = document.querySelector('.mouth');
+        
+        // 2. This function runs every time the mouse moves
+        const handleMove = (e) => {
+            // Find the center point of your browser window
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            
+            // 3. Calculate how far the mouse is from the center
+            // 'x' and 'y' will be between -1 (far left/top) and 1 (far right/bottom)
+            const x = (e.clientX - centerX) / centerX;
+            const y = (e.clientY - centerY) / centerY;
+            
+            // 4. EYE MOVEMENT
+            // Multiply 'x' by 70 to move the eyeball within the white socket (70% offset)
+            const eyeX = x * 70; 
+            const eyeY = y * 70;
+            eyeballs.forEach(el => {
+                el.style.transform = `translate(${eyeX}%, ${eyeY}%)`;
+            });
+
+            // 5. MOUTH MOVEMENT
+            // Move the mouth horizontally by up to 20 pixels
+            const mouthX = x * 20; 
+            // Rotate the mouth by up to 15 degrees based on mouse position
+            const mouthRotate = x * 15; 
+            
+            // Apply both the shift and the tilt to the mouth
+            mouth.style.transform = `translateX(${mouthX}px) rotate(${mouthRotate}deg)`;
+        };
+
+        // 6. Tell the browser to listen for the mouse moving and trigger our function
+        window.addEventListener('mousemove', handleMove);
+    </script>
+</body>
+</html>
